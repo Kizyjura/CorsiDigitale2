@@ -210,145 +210,8 @@ footer {
 
 
 </style>
-<script>   
-        // ============================================
-        // CONFIGURAZIONE - MODIFICA QUI IL TUO URL
-        // ============================================
-        const API_URL = 'https://script.google.com/macros/s/AKfycbwp2gclUaxy7XMocDWCJzTSHb3NGiqJeA01-ZryoRZNLQNqtwNSNFgC58dZhWL0e0rWzw/exec';
 
-        let allData = [];
-        let headers = [];
-
-        // ============================================
-        // FUNZIONE PRINCIPALE
-        // ============================================
-        async function fetchData() {
-            const contentDiv = document.getElementById('content');
-            contentDiv.innerHTML = '<div class="loading">Caricamento dati...</div>';
-
-            try {
-                const response = await fetch(API_URL);
-                
-                if (!response.ok) {
-                    throw new Error('Errore HTTP: ' + response.status);
-                }
-
-                const data = await response.json();
-                
-                if (data.error) {
-                    throw new Error(data.error);
-                }
-
-                headers = data.headers;
-                allData = data.rows;
-
-                displayData(headers, allData);
-                document.getElementById('lastUpdate').textContent = 
-                    'Ultimo aggiornamento: ' + data.lastUpdate;
-                
-            } catch (error) {
-                console.error('Errore:', error);
-                contentDiv.innerHTML = `
-                    <div class="error">
-                        <strong>❌ Errore</strong><br>
-                        ${error.message}
-                    </div>
-                `;
-            }
-        }
-
-        // ============================================
-        // MOSTRA DATI - Gestisce link e testo
-        // ============================================
-        function displayData(headers, rows) {
-    const contentDiv = document.getElementById('content');
-    
-    if (rows.length === 0) {
-        contentDiv.innerHTML = '<div class="no-results">Nessun dato trovato</div>';
-        return;
-    }
-
-    let html = '<table><thead><tr>';
-    headers.forEach(header => {
-        html += `<th>${escapeHtml(header)}</th>`;
-    });
-    html += '</tr></thead><tbody>';
-
-    rows.forEach(row => {
-        html += '<tr>';
-        headers.forEach(header => {
-            const cell = row[header];
-            
-            // Se è un'immagine
-            if (cell && typeof cell === 'object' && cell.type === 'image') {
-                html += `<td><img src="${cell.url}" alt="Immagine" style="max-width: 150px; max-height: 100px; border-radius: 5px; object-fit: cover;"></td>`;
-            }
-            // Se è un link
-            else if (cell && typeof cell === 'object' && cell.type === 'link') {
-                html += `<td><a href="${cell.url}" target="_blank">${escapeHtml(cell.text)}</a></td>`;
-            }
-            // Se è una stringa URL
-            else if (typeof cell === 'string' && cell.match(/^https?:\/\//)) {
-                // Controlla se è un'immagine per estensione
-                if (cell.match(/\.(jpg|jpeg|png|gif|webp|svg)$/i)) {
-                    html += `<td><img src="${cell}" alt="Immagine" style="max-width: 150px; max-height: 100px; border-radius: 5px; object-fit: cover;"></td>`;
-                } else {
-                    html += `<td><a href="${cell}" target="_blank">${escapeHtml(cell)}</a></td>`;
-                }
-            }
-            // Testo normale
-            else {
-                html += `<td>${escapeHtml(cell !== null && cell !== undefined ? cell : '')}</td>`;
-            }
-        });
-        html += '</tr>';
-    });
-
-    html += '</tbody></table>';
-    contentDiv.innerHTML = html;
-}
-        // ============================================
-        // UTILITY
-        // ============================================
-        function escapeHtml(text) {
-            if (text === null || text === undefined) return '';
-            const div = document.createElement('div');
-            div.textContent = String(text);
-            return div.innerHTML;
-        }
-
-        // ============================================
-        // RICERCA
-        // ============================================
-        document.getElementById('searchInput').addEventListener('input', function(e) {
-            const searchTerm = e.target.value.toLowerCase().trim();
-            
-            if (searchTerm === '') {
-                displayData(headers, allData);
-                return;
-            }
-
-            const filtered = allData.filter(row => {
-                return Object.values(row).some(value => {
-                    // Cerca sia nel testo che nell'URL se è un link
-                    if (value && typeof value === 'object' && value.type === 'link') {
-                        return value.text.toLowerCase().includes(searchTerm) || 
-                               value.url.toLowerCase().includes(searchTerm);
-                    }
-                    return String(value).toLowerCase().includes(searchTerm);
-                });
-            });
-
-            displayData(headers, filtered);
-        });
-
-        // ============================================
-        // AVVIO
-        // ============================================
-        fetchData();
-
- </script>
-<meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
 
 </head>
 <body>
@@ -717,7 +580,146 @@ Un’offerta pensata per rispondere a esigenze diverse: dalla gestione personale
 
    
 </body>
+  <script>   
+        // ============================================
+        // CONFIGURAZIONE - MODIFICA QUI IL TUO URL
+        // ============================================
+        const API_URL = 'https://script.google.com/macros/s/AKfycbwp2gclUaxy7XMocDWCJzTSHb3NGiqJeA01-ZryoRZNLQNqtwNSNFgC58dZhWL0e0rWzw/exec';
+
+        let allData = [];
+        let headers = [];
+
+        // ============================================
+        // FUNZIONE PRINCIPALE
+        // ============================================
+        async function fetchData() {
+            const contentDiv = document.getElementById('content');
+            contentDiv.innerHTML = '<div class="loading">Caricamento dati...</div>';
+
+            try {
+                const response = await fetch(API_URL);
+                
+                if (!response.ok) {
+                    throw new Error('Errore HTTP: ' + response.status);
+                }
+
+                const data = await response.json();
+                
+                if (data.error) {
+                    throw new Error(data.error);
+                }
+
+                headers = data.headers;
+                allData = data.rows;
+
+                displayData(headers, allData);
+                document.getElementById('lastUpdate').textContent = 
+                    'Ultimo aggiornamento: ' + data.lastUpdate;
+                
+            } catch (error) {
+                console.error('Errore:', error);
+                contentDiv.innerHTML = `
+                    <div class="error">
+                        <strong>❌ Errore</strong><br>
+                        ${error.message}
+                    </div>
+                `;
+            }
+        }
+
+        // ============================================
+        // MOSTRA DATI - Gestisce link e testo
+        // ============================================
+        function displayData(headers, rows) {
+    const contentDiv = document.getElementById('content');
+    
+    if (rows.length === 0) {
+        contentDiv.innerHTML = '<div class="no-results">Nessun dato trovato</div>';
+        return;
+    }
+
+    let html = '<table><thead><tr>';
+    headers.forEach(header => {
+        html += `<th>${escapeHtml(header)}</th>`;
+    });
+    html += '</tr></thead><tbody>';
+
+    rows.forEach(row => {
+        html += '<tr>';
+        headers.forEach(header => {
+            const cell = row[header];
+            
+            // Se è un'immagine
+            if (cell && typeof cell === 'object' && cell.type === 'image') {
+                html += `<td><img src="${cell.url}" alt="Immagine" style="max-width: 150px; max-height: 100px; border-radius: 5px; object-fit: cover;"></td>`;
+            }
+            // Se è un link
+            else if (cell && typeof cell === 'object' && cell.type === 'link') {
+                html += `<td><a href="${cell.url}" target="_blank">${escapeHtml(cell.text)}</a></td>`;
+            }
+            // Se è una stringa URL
+            else if (typeof cell === 'string' && cell.match(/^https?:\/\//)) {
+                // Controlla se è un'immagine per estensione
+                if (cell.match(/\.(jpg|jpeg|png|gif|webp|svg)$/i)) {
+                    html += `<td><img src="${cell}" alt="Immagine" style="max-width: 150px; max-height: 100px; border-radius: 5px; object-fit: cover;"></td>`;
+                } else {
+                    html += `<td><a href="${cell}" target="_blank">${escapeHtml(cell)}</a></td>`;
+                }
+            }
+            // Testo normale
+            else {
+                html += `<td>${escapeHtml(cell !== null && cell !== undefined ? cell : '')}</td>`;
+            }
+        });
+        html += '</tr>';
+    });
+
+    html += '</tbody></table>';
+    contentDiv.innerHTML = html;
+}
+        // ============================================
+        // UTILITY
+        // ============================================
+        function escapeHtml(text) {
+            if (text === null || text === undefined) return '';
+            const div = document.createElement('div');
+            div.textContent = String(text);
+            return div.innerHTML;
+        }
+
+        // ============================================
+        // RICERCA
+        // ============================================
+        document.getElementById('searchInput').addEventListener('input', function(e) {
+            const searchTerm = e.target.value.toLowerCase().trim();
+            
+            if (searchTerm === '') {
+                displayData(headers, allData);
+                return;
+            }
+
+            const filtered = allData.filter(row => {
+                return Object.values(row).some(value => {
+                    // Cerca sia nel testo che nell'URL se è un link
+                    if (value && typeof value === 'object' && value.type === 'link') {
+                        return value.text.toLowerCase().includes(searchTerm) || 
+                               value.url.toLowerCase().includes(searchTerm);
+                    }
+                    return String(value).toLowerCase().includes(searchTerm);
+                });
+            });
+
+            displayData(headers, filtered);
+        });
+
+        // ============================================
+        // AVVIO
+        // ============================================
+        fetchData();
+
+ </script>
 </html>
+
 
 
 
